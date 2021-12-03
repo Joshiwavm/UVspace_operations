@@ -4,7 +4,7 @@ COMPONENTS = {
     "pointSource": {
         "id": 1,
         "variables": [ 
-            "RA", "Dec", "Amp", "Off"
+            "RA", "Dec", "amp", "offset"
         ],
         "analytical"  :   True,
         "spectrum"    :  False, 
@@ -15,7 +15,7 @@ COMPONENTS = {
    "gaussSource": {
         "id": 2,
         "variables": [ 
-            "RA", "Dec", "Amp", "Major", "e", "Angle", "Off"
+            "RA", "Dec", "amp", "Major", "e", "Angle", "offset"
         ],
         "analytical"  :   True,
         "spectrum"    :  False, 
@@ -26,7 +26,7 @@ COMPONENTS = {
     "gaussSurface": {
         "id": 3,
         "variables": [ 
-            "RA", "Dec", "Amp", "Major", "e", "Angle", "Off", "Temp"
+            "RA", "Dec", "amp", "Major", "e", "Angle", "offset", "Temp"
         ],
         "analytical"  :   True,
         "spectrum"    :  False, 
@@ -38,7 +38,7 @@ COMPONENTS = {
         "id": 4,
         "function": betaProfile,
         "variables": [ 
-            "RA", "Dec", "Amp", "Major", "e", "Angle", "Off", "Temp", "Beta", 'z'
+            "RA", "Dec", "amp", "Major", "e", "Angle", "offset", "Temp", "beta", 'z'
         ],
         "analytical"  :  False,
         "spectrum"    :  False, 
@@ -50,7 +50,7 @@ COMPONENTS = {
         "id": 5,
         "function": gnfwProfile,
         "variables": [ 
-            "RA", "Dec", "Amp", "Major", "e", "Angle", "Off", "Temp", "Beta", "Gamma", "z"
+            "RA", "Dec", "amp", "Major", "e", "Angle", "offset", "Temp", "beta", "gamma", "z"
         ],
         "analytical"  :  False,
         "spectrum"    :  False, 
@@ -61,8 +61,8 @@ COMPONENTS = {
     "A10Pressure": {
         "id": 6,
         "function": a10Profile,
-        "variables": [ 
-            "RA", "Dec", "logm500", "c500", "e", "Angle", "Off", "Temp", "Alpha", "Beta", "Gamma", "P0", "Alpha_p", "z", "bias"
+        "variables": [  #major = c500?, also 'ap' and 'major' can't be found back 
+            "RA", "Dec", "mass", "c500", "e", "Angle", "offset", "Temp", "alpha", "beta", "gamma", "P0", "Alpha_p", "z", "bias"
         ],
         "analytical"  :  False,
         "spectrum"    :  False, 
@@ -95,12 +95,22 @@ COMPONENTS = {
     "powerDust": {
         "id": 9,
         "variables": [ 
-            "spec_index", "spec_curv", "Temp", "Beta", "z", "kappa0", "nu0"
+            "spec_index", "spec_curv", "Temp", "beta", "z", "kappa0", "nu0"
         ],
         "analytical"  :  True,
         "spectrum"    :  True, 
         "var_to_print":[
             'SpecIndex','log(Mass/M_sun)','Temperature (keV)','Beta','z','kappa0','nu0'
+        ]
+    },
+    "tSZ": {
+        'id':  10, 
+        "variables": [ 
+        ],
+        "analytical"  :  True,
+        "spectrum"    :  True, 
+        "var_to_print":[
+
         ]
     }
 }
