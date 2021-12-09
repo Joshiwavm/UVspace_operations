@@ -1,75 +1,90 @@
 from settings import COMPONENTS
 from wrapper import *
 from models import *
-from fourier import *
-from msmanager import MsReader
+from FourierTransform import *
+from msmanager import *
+from UnitTransform import *
+
+from astropy.io import fits
 
 class Modeler:
-    def __init__(self, types, filename, ms_filename, outputdir = './plots/'):
-        self.types = types
-        self.file = filename
-        self.msfile = ms_filename
+    def __init__(self, filename_samples, filename_ms, filename_pb, outputdir = './plots/',  save = False):
+        self.file = filename_samples
+        self.msfile = filename_ms
+        self.pbfile = filename_pb
         self.outputdir = outputdir
+        self.save = save
 
-        self._load_models()
-        self._load_popt()
-        self._load_ms()
+        reader = FileReader()
+        self.popt = reader.execute(self.file)
 
-    def _load_models(self):
-        self.models = []
-        for t in self.types:
-            if 'function' in COMPONENTS[t]:
-                self.models.append(COMPONENTS[t]['function'])
-            else:
-                self.models.append(None)
-
-    def _load_popt(self):
-        self.popt = []
-        for t in self.types:
-            reader = FileReader([t])
-            self.popt.append(reader.execute(self.file))
+        self.pbeam = self._load_pb()
 
     def _load_ms(self):
         #use msmanager.py file here
         pass
+    
+    def _load_pb(self):
+        """ For now I use the pb file out of output directory made with eszee. 
+        Better would be to make a dirty image from the ms file and grab the created .pb image. 
+        """
+        pb, he_pb = fits.getdata(self.pbfile, header = True)
+        pb_im = pb[0,0]
+        pb_im[np.isnan(True)] = 0.0
+        
+        return pb_im
 
-    def _make_modelimage(self, grid, save):
+    def _make_grid(self):
+        xx, yy = np
+        pass
+    
+    def _make_modelimage(self):
+
+        #use pb for a grid
+
+        grid  = 
         image = np.zeros_like(grid)
-        for idx, t  in enumerate(self.types):
-            if 'function' in COMPONENTS[t]:
-                image += self.models[idx](grid, **self.popt[idx])
 
-        if save: np.save(self.outputdir + 'noiseless_model', image)
+        for t  in self.popt.keys():
+            if COMPONENTS[t]['make_image'] == True:
+                image += COMPONENTS[t]['function'](grid, **self.popt[t])
+
+        if self.save: np.save(self.outputdir + 'noiseless_model', image)
         return image
 
-    def run(self, grid, save = False):        
+    def run(self):        
         
-        image = self._make_modelimage(grid, save)
+        #check if we need to fourier transform
+        check = 0
+        for key in self.popt.keys():
+            check += COMPONENTS[key]['make_image'] 
+
+        if check > 0: 
+            image = self._make_modelimage()
+            fourier = True
+        else: 
+            fourier = False
         
+        if fourier:
+            pass
+            # Fourier = FT()
+            # out_uv = Fourier.execute(image)
+        else:
+            pass
+            # directly to the visibility modeling
 
-        # Fourier = FourierTransform()
-        # out_uv = Fourier.execute(image)
+def main(filename_samples, filename_ms, filename_pb): 
 
-        # self._save(out_uv, obs)
-        # return out_uv
-
-
-    def _save(self):
-        pass
-
-def main(filename, ms_name, types): 
-
-    grid = np.arange(0,1024,1)
-    obj = Modeler(types, filename, ms_name)
-    out = obj.run(grid)
+    obj = Modeler(filename_samples, filename_ms, filename_pb, save = True)
+    out = obj.run()
 
     print(80*"#")
     print(out)
     print(80 * "#")
 
 if __name__ == '__main__':
-    filename  = '/scigarfs/home/jvmarrewijk/eszee/outputdir/RXC_J2014.8_ALMA_pointonly_pickle'
-    ms_name   = 'some/name/to/ms/file'
-    types     = ["pointSource", "powerLaw"] #should be inproper order as modelled
+    filename_samples  = '/scigarfs/home/jvmarrewijk/eszee/outputdir/RXC_J2014.8_ALMA_pointonly_pickle'
+    filename_ms       = 'some/name/to/ms/file'
+    filename_pb       = 'some/path'
 
-    main(filename, ms_name, types)
+    main(filename_samples, filename_ms, filename_pb)
