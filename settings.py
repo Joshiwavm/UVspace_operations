@@ -4,9 +4,9 @@ COMPONENTS = {
     "pointSource": {
         "id": 1,
         "variables": [ 
-            "RA", "Dec", "amp", "offset"
+            'RA','Dec','Amplitude','Offset'
         ],
-        "analytical"  :   True,
+        "make_image"  :   False,
         "spectrum"    :  False, 
         "var_to_print":[
             'RA (deg)','Dec (deg)','Amplitude (Jy)','Offset'
@@ -15,9 +15,9 @@ COMPONENTS = {
    "gaussSource": {
         "id": 2,
         "variables": [ 
-            "RA", "Dec", "amp", "Major", "e", "Angle", "offset"
+            'RA','Dec','Amplitude','Major','e','Angle','Offset'
         ],
-        "analytical"  :   True,
+        "make_image"  :   False,
         "spectrum"    :  False, 
         "var_to_print":[
             'RA (deg)','Dec (deg)','Amplitude (Jy)','Major (deg)','e','Angle (deg)','Offset'
@@ -26,9 +26,9 @@ COMPONENTS = {
     "gaussSurface": {
         "id": 3,
         "variables": [ 
-            "RA", "Dec", "amp", "Major", "e", "Angle", "offset", "Temp"
+            'RA', 'Dec', 'Amplitude', 'Major', 'e', 'Angle', 'Offset', 'Temperature'
         ],
-        "analytical"  :   True,
+        "make_image"  :   False,
         "spectrum"    :  False, 
         "var_to_print":[
             'RA (deg)','Dec (deg)','Amplitude (Jy)','Major (deg)','e','Angle (deg)','Offset','Temperature (keV)'
@@ -38,9 +38,9 @@ COMPONENTS = {
         "id": 4,
         "function": betaProfile,
         "variables": [ 
-            "RA", "Dec", "amp", "Major", "e", "Angle", "offset", "Temp", "beta", 'z'
+           'RA', 'Dec', 'Amplitude', 'Major', 'e', 'Angle', 'Offset', 'Temperature', 'Beta', 'z'
         ],
-        "analytical"  :  False,
+        "make_image"  :  True,
         "spectrum"    :  False, 
         "var_to_print":[
             'RA (deg)','Dec (deg)','Amplitude (keV/cm3)','Major (deg)','e','Angle (deg)','Offset','Temperature (keV)','Beta','z'
@@ -50,9 +50,9 @@ COMPONENTS = {
         "id": 5,
         "function": gnfwProfile,
         "variables": [ 
-            "RA", "Dec", "amp", "Major", "e", "Angle", "offset", "Temp", "beta", "gamma", "z"
+            'RA', 'Dec', 'Amplitude', 'Major', 'e', 'Angle', 'Offset', 'Temperature', 'Alpha', 'Beta', 'Gamma', 'z'
         ],
-        "analytical"  :  False,
+        "make_image"  :  True,
         "spectrum"    :  False, 
         "var_to_print":[
             'RA (deg)','Dec (deg)','Amplitude (keV/cm3)','Major (deg)','e','Angle (deg)','Offset','Temperature (keV)','Beta', 'Gamma', 'z'
@@ -61,21 +61,33 @@ COMPONENTS = {
     "A10Pressure": {
         "id": 6,
         "function": a10Profile,
-        "variables": [  #major = c500?, also 'ap' and 'major' can't be found back 
-            "RA", "Dec", "mass", "c500", "e", "Angle", "offset", "Temp", "alpha", "beta", "gamma", "P0", "Alpha_p", "z", "bias"
+        "variables": [ 
+            'RA', 'Dec', 'log10', 'c500', 'e', 'Angle', 'Offset', 'Temperature', 'Alpha', 'Beta', 'Gamma', 'P0', 'Alpha_p', 'z', 'bias'
         ],
-        "analytical"  :  False,
+        "make_image"  :  True,
         "spectrum"    :  False, 
         "var_to_print":[
             'RA (deg)','Dec (deg)','log10(M500/Msun)','c500','e','Angle (deg)','Offset','Temperature (keV)','Alpha','Beta','Gamma','P0','Alpha_p','z','bias'
         ]
     },
+    "A10PressureLS": {
+        "id": 6,
+        "function": a10Profile,
+        "variables": [  #major = c500?, also 'ap' and 'major' can't be found back 
+            'RA', 'Dec', 'log10', 'c500', 'e', 'Angle', 'Offset', 'Temperature', 'Alpha', 'Beta', 'Gamma', 'P0', 'Alpha_p', 'z', 'bias', 'depth'
+        ],
+        "make_image"  :  True,
+        "spectrum"    :  False, 
+        "var_to_print":[
+            'RA (deg)','Dec (deg)','log10(M500/Msun)','c500','e','Angle (deg)','Offset','Temperature (keV)','Alpha','Beta','Gamma','P0','Alpha_p','z','bias', 'depth'
+        ]
+    },
     "powerLaw": {
         "id": 7,
         "variables": [ 
-            "spec_index"
+            "SpecIndex"
         ],
-        "analytical"  :  True,
+        "make_image"  :  False,
         "spectrum"    :  True, 
         "var_to_print":[
             'SpecIndex'
@@ -84,9 +96,9 @@ COMPONENTS = {
     "powerLawMod": {
         "id": 8,
         "variables": [ 
-            "spec_index", "spec_curv"
+            "SpecIndex", "SpecCurv"
         ],
-        "analytical"  :  True,
+        "make_image"  :  False,
         "spectrum"    :  True, 
         "var_to_print":[
             'SpecIndex','SpecCurv'
@@ -95,9 +107,9 @@ COMPONENTS = {
     "powerDust": {
         "id": 9,
         "variables": [ 
-            "spec_index", "spec_curv", "Temp", "beta", "z", "kappa0", "nu0"
+            "SpecIndex", "SpecCurv", "Temp", "beta", "z", "kappa0", "nu0"
         ],
-        "analytical"  :  True,
+        "make_image"  :  False,
         "spectrum"    :  True, 
         "var_to_print":[
             'SpecIndex','log(Mass/M_sun)','Temperature (keV)','Beta','z','kappa0','nu0'
@@ -107,10 +119,21 @@ COMPONENTS = {
         'id':  10, 
         "variables": [ 
         ],
-        "analytical"  :  True,
+        "make_image"  :  False,
         "spectrum"    :  True, 
         "var_to_print":[
 
+        ]
+    },
+    "Scaling": {
+        'id':  11, 
+        "variables": [ 
+            'amp'
+        ],
+        "make_image"  :  False,
+        "spectrum"    :  True, 
+        "var_to_print":[
+            'alpha'
         ]
     }
 }
