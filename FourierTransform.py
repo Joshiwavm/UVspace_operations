@@ -1,6 +1,6 @@
 #module for the fourier transform
 
-class FourierTransform():
+class FT():
 
     def __init__(self) -> None:
         pass
