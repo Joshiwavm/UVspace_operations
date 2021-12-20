@@ -10,6 +10,8 @@ class FT():
         self.pb_head  = pb_head
         self.pb_im    = pb_im
         
+    ################################################################################
+        
     def _spw_PointSource(self, model, reffreq):
         spwRA   = self.pb_head['CRPIX1'] # I think CRPIX1 is in pixel
         spwRA  += (model['RA']-self.pb_head['CRVAL1'])*np.cos(np.deg2rad(self.pb_head['CRVAL2']))/self.pb_head['CDELT1'] 
@@ -45,6 +47,9 @@ class FT():
     
     def _spw_powerDust(self, model, spectrum, reffreq, spwbeam):
         pass
+    
+    ################################################################################
+    
         
     def partouv(self, spwpoints, model, spectrum, model_type, spectrum_type):
         
