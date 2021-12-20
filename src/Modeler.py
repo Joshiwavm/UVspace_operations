@@ -7,48 +7,41 @@ from astropy.io import fits
 from astropy.wcs import WCS
 
 """
-To do:
-    - I have one pb for all three spws
-    - I have to provide a pb for the data set, so I need to make it compatible for ALMA and ACA
-        - I can make the pb from tclean the ms file to make a dirty image
-        - Also the pb changes in size over frequency which makes the density profile more inacurate
-            
+To do:            
     - Do the fourier transform of the image/cube
-    - Do the alpha scaling in the end. Make sure it automatically provides the proper scaling to ALMA and ACA
-    - Put it on Github
     
-    -put residues and model  back into new ms files
+    - Get spws and fields in MsManager direcelty from the listobs (don't know if that is possible)
+    - put residues and model back into new ms files
 """
-
 
 class Modeler:
     def __init__(self, 
                  filename_samples, 
                  filename_ms, 
-                 filename_pb, 
-                 outputdir = '/scigarfs/home/jvmarrewijk/eszee/plots/', #hardcoded quickfix
+                 obs_type, 
+                 outputdir = './output/',
                  save = False):
         
         self.file = filename_samples
         self.msfile = filename_ms
-        self.pbfile = filename_pb
         self.outputdir = outputdir
         self.save = save
-
+        
         reader = FileReader()
         self.popt = reader.execute(self.file)
-
-        self._load_pb()
         self.info = getinfo()
         
-        msreader = MsReader(self.msfile)
-        self.uvdata = msreader.uvloader() 
-                
-        self.FT = FT(self.uvdata, self.pb_hb, self.pb_im)
+        self.obs_type = obs_type
+
+        self.msreader = MsReader(self.msfile, self.obs_type)        
+        self.msreader.prep_pb()
     
-    def _load_pb(self):
-        pb, he_pb = fits.getdata(self.pbfile, header = True)
-        pb_im = pb[0,0] #hard coded quickfix
+    def _load_pb(self, spw, field):
+        outvis = self.msreader.binvis.replace('-fid','-{0}'.format(field))
+        outvis = outvis.replace('-sid','-{0}'.format(spw))
+                
+        pb, he_pb = fits.getdata('{0}.pbeam.fits'.format(outvis.replace('.ms','.im')), header = True)
+        pb_im = pb[0,0] 
         pb_im[np.isnan(pb_im)] = 0.0
         
         self.pb_im = pb_im
@@ -69,7 +62,7 @@ class Modeler:
 
         r  =  (Dec-np.mean(Dec))**2 
         r += ((RA - np.mean(RA))*np.cos(np.deg2rad(np.mean(Dec.value))))**2
-        r  = r**0.5 #degrees
+        r  = r**0.5 
         return r
     
     def _make_modelimage(self):
@@ -100,7 +93,8 @@ class Modeler:
         if self.save: np.save(self.outputdir + 'noiseless_model', image)
         return image
     
-    
+    ################################################################################
+
     def _partouv(self):
         spwpoints = np.zeros(np.shape(self.uvdata[0]),dtype=np.complex128)
         
@@ -112,12 +106,26 @@ class Modeler:
             
             spwpoints = self.FT.partouv(spwpoints, self.popt[model_type], self.popt[spectrum_type], model_type, spectrum_type)
         return spwpoints
-            
+    
+    
+    def _get_analytical_model(self):
+        vis_model = np.empty(0)
+        datas    = np.empty((3,0))
+        
+        for spw in self.msreader.spws:
+            for field in self.msreader.fields:
+                
+                self._load_pb(spw, field)
+                self.uvdata = self.msreader.uvloader(spw, field) 
+                self.FT     = FT(self.uvdata, self.pb_hb, self.pb_im)
+                
+                vis_model = np.append(vis_model, self._partouv())
+                datas     = np.hstack((datas, self.uvdata))
+        return vis_model, datas
+    
     def run(self):        
-        #Fourier Transform analytical Functions first
-        vis_model = self._partouv()
-
-        #check if an image needs to be transformed        
+        vis_model, datas = self._get_analytical_model()
+            
         check = 0
         for key in self.popt.keys():
             if key == 'Link':
@@ -127,6 +135,4 @@ class Modeler:
         if check > 0: 
             image = self._make_modelimage()
             
-        #apply alpha scaling
-            
-        return vis_model, self.uvdata
+        return vis_model, self.popt['Scaling'], datas
