@@ -17,8 +17,9 @@ def uv_load(uv_data, uv_model, filename_ms, telescp, scaling):
     else:
         uv_real *= scaling['scale0']
 
-    r_uv_real = uv_real - uv_model.real*1e3
-    r_uv_imag = uv_imag - uv_model.imag*1e3
+    r_uv_real = uv_real# - uv_model.real*1e3
+    r_uv_imag = uv_imag# - uv_model.imag*1e3
+    
     return r_uv_real, r_uv_imag, uv_wghts, uvdist
 
 
@@ -67,7 +68,7 @@ def main(filename_samples, filename_ms, telescp):
         uvimag = np.append(uvimag, r_uv_imag)
         uvwght = np.append(uvwght, uv_wghts)
 
-    UVrealbinned, UVrealerrors, UVimagbinned, UVimagerrors, bins = bin_it(uvimag, uvreal, uvwght, uvdist, nbins = 7)        
+    UVrealbinned, UVrealerrors, UVimagbinned, UVimagerrors, bins = bin_it(uvreal, uvimag, uvwght, uvdist, nbins = 7)        
 
     ax[0].scatter(uvdist[uvtype == 0], uvreal[uvtype == 0], s = .1, label = telescp[0])
     ax[0].scatter(uvdist[uvtype == 1], uvreal[uvtype == 1], s = .1, label = telescp[1])
@@ -75,7 +76,7 @@ def main(filename_samples, filename_ms, telescp):
     ax[0].axhline(0, ls = 'dashed', c = 'gray')
     ax[0].axis(ymin = -3, ymax = 5)
 
-    ax[0].set_ylabel('Re(V)$_{data}$ - Re(v)$_{model}$ [mJy]')
+    ax[0].set_ylabel('Re(V)$_{data}$')#' - Re(v)$_{model}$ [mJy]')
     ax[0].set_xlabel('k$\lambda$')
     ax[0].set_xscale('log')
     ax[0].legend()
@@ -85,14 +86,14 @@ def main(filename_samples, filename_ms, telescp):
     ax[1].errorbar((bins[1:]+bins[:-1])/2, UVimagbinned, xerr = (bins[1:] - bins[:-1])/2, yerr = UVimagerrors, c = 'C2', ls = '', marker = 'o')
     ax[1].axhline(0, ls = 'dashed', c = 'gray')
     ax[1].axis(ymin = -5e0, ymax = 5e-0)
-    ax[1].set_ylabel('Im(V)$_{data}$ - Im(V)$_{model}$ [mJy]')
+    ax[1].set_ylabel('Im(V)$_{data}$')#' - Im(V)$_{model}$ [mJy]')
     ax[1].set_xlabel('k$\lambda$') 
     ax[1].set_xscale('log')
     ax[1].legend()
 
     plt.tight_layout()
-    plt.savefig('/scigarfs/home/jvmarrewijk/eszee/plots/vis_residue_pointandSZ_ACA_ALMA.pdf')
-    plt.show()
+    plt.savefig('/scigarfs/home/jvmarrewijk/eszee/plots/vis_pointandSZ_ACA_ALMA.pdf')
+    plt.close()
     
 if __name__ == '__main__':
     names              = ['RXC_J2014.8_ALMA_pointonly', 
